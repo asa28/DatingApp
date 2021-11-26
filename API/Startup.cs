@@ -25,6 +25,7 @@ namespace API
     }
 
     // This method gets called by the runtime. Use this method to add services to the container.
+    // this Method Does NOT Care about ordering the commands
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<DataContext>(opts =>
@@ -32,7 +33,7 @@ namespace API
         opts.UseSqlite(_config.GetConnectionString("DefaultConnection"));
       });
 
-
+      services.AddCors();
       services.AddControllers();
       services.AddSwaggerGen(c =>
       {
@@ -41,6 +42,7 @@ namespace API
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    // this Method MUST Have Ordered commands
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
       if (env.IsDevelopment())
@@ -53,6 +55,8 @@ namespace API
       app.UseHttpsRedirection();
 
       app.UseRouting();
+
+      app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
 
       app.UseAuthorization();
 
